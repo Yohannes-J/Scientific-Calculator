@@ -5,7 +5,7 @@
   <style>
     body {
       font-family: sans-serif;
-      background-color:gray;
+      background-color: gray;
     }
 
     .calculator {
@@ -47,11 +47,9 @@
       background-color: #f0f0f0;
     }
 
-  
     h2 {
       text-align: center;
       color: bisque;
-    
     }
   </style>
 </head>
@@ -93,14 +91,10 @@
     <button onclick="appendOperator('Math.exp(')">e<sup>x</sup></button>
     <button onclick="appendOperator('Math.PI')">π</button>
     <button onclick="appendOperator('Math.abs(')">|x|</button>
-
-    <!-- Buttons for brackets -->
-    <button onclick="appendOperator('(')"> ( </button>
-    <button onclick="appendOperator(')')"> ) </button>
-
-    <!-- New buttons for percentage and factorial -->
     <button onclick="appendOperator('%')">%</button>
     <button onclick="appendOperator('!')">!</button>
+    <button onclick="appendOperator('(')"> ( </button>
+    <button onclick="appendOperator(')')"> ) </button>
   </div>
 </div>
 
@@ -119,7 +113,6 @@
   }
 
   function appendTrigFunction(func) {
-    // Handle trig functions separately to ensure degrees to radians conversion
     expression += func + '(';
     display.textContent = expression;
   }
@@ -129,9 +122,31 @@
     display.textContent = '';
   }
 
+  function clearOne() {
+    if (expression.length > 0) {
+      expression = expression.slice(0, -1);
+      display.textContent = expression;
+    }
+  }
+
+  function factorial(n) {
+    if (n < 0) return "Error: Factorial of a negative number is undefined";
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  }
+
   function calculate() {
     try {
-      // Replace trig function placeholders with actual JavaScript Math functions with radians conversion
+      // Replace factorial operator
+      expression = expression.replace(/(\d+)!/g, function(match, number) {
+        return factorial(parseInt(number));
+      });
+
+      // Replace trigonometric functions with radians conversion
       expression = expression.replace(/sin\(/g, 'Math.sin(Math.PI/180*');
       expression = expression.replace(/cos\(/g, 'Math.cos(Math.PI/180*');
       expression = expression.replace(/tan\(/g, 'Math.tan(Math.PI/180*');
@@ -139,12 +154,9 @@
       expression = expression.replace(/sec\(/g, '1/Math.cos(Math.PI/180*');
       expression = expression.replace(/cot\(/g, '1/Math.tan(Math.PI/180*');
 
-      // Replace factorial '!' with factorial function
-      expression = expression.replace(/!/g, 'factorial(');
-
+      // Handle calculation
       let result = eval(expression);
 
-      // Handle very small numbers close to zero
       if (Math.abs(result) < 1e-10) {
         result = 0;
       }
@@ -159,28 +171,6 @@
       expression = result.toString();
     } catch (error) {
       display.textContent = "Error";
-    }
-  }
-
-  function clearOne() {
-    if (expression.length > 0) {
-      expression = expression.slice(0, -1); // Remove last character
-      display.textContent = expression;
-    }
-  }
-
-  function factorial(num) {
-    num = parseInt(num);
-    if (num < 0) {
-      return "Error: Factorial of a negative number is undefined";
-    } else if (num === 0 || num === 1) {
-      return 1;
-    } else {
-      let result = 1;
-      for (let i = 2; i <= num; i++) {
-        result *= i;
-      }
-      return result;
     }
   }
 </script>
