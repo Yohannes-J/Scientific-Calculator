@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scientific Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color:gray;
+    }
+
+    .calculator {
+      width: 300px;
+      margin: 50px auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: rgb(69, 121, 121);
+    }
+
+    .display {
+      background-color: #eee;
+      padding: 10px;
+      text-align: right;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 5px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 22px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #f0f0f0;
+    }
+
+    button.operator {
+      background-color: #f0f0f0;
+    }
+
+  
+    h2 {
+      text-align: center;
+      color: bisque;
+    
+    }
+  </style>
+</head>
+<body>
+
+<h2>Scientific Calculator</h2>
+
+<div class="calculator">
+  <div class="display" id="display"></div>
+  <div class="buttons">
+    <button onclick="appendNumber('7')">7</button>
+    <button onclick="appendNumber('8')">8</button>
+    <button onclick="appendNumber('9')">9</button>
+    <button class="operator" onclick="appendOperator('/')">/</button>
+    <button onclick="appendNumber('4')">4</button>
+    <button onclick="appendNumber('5')">5</button>
+    <button onclick="appendNumber('6')">6</button>
+    <button class="operator" onclick="appendOperator('*')">*</button>
+    <button onclick="appendNumber('1')">1</button>
+    <button onclick="appendNumber('2')">2</button>
+    <button onclick="appendNumber('3')">3</button>
+    <button class="operator" onclick="appendOperator('-')">-</button>
+    <button onclick="appendNumber('0')">0</button>
+    <button onclick="appendNumber('.')">.</button>
+    <button onclick="calculate()">=</button>
+    <button class="operator" onclick="appendOperator('+')">+</button>
+    <button onclick="clearDisplay()">C</button>
+    <button onclick="clearOne()">C1</button>
+    <button onclick="appendOperator('Math.sqrt(')">&radic;</button>
+    <button onclick="appendOperator('Math.pow(')">x<sup>y</sup></button>
+    <button onclick="appendTrigFunction('sin')">sin</button>
+    <button onclick="appendTrigFunction('cos')">cos</button>
+    <button onclick="appendTrigFunction('tan')">tan</button>
+    <button onclick="appendTrigFunction('csc')">csc</button>
+    <button onclick="appendTrigFunction('sec')">sec</button>
+    <button onclick="appendTrigFunction('cot')">cot</button>
+    <button onclick="appendOperator('Math.log(')">log</button>
+    <button onclick="appendOperator('Math.log(')">ln</button>
+    <button onclick="appendOperator('Math.exp(')">e<sup>x</sup></button>
+    <button onclick="appendOperator('Math.PI')">π</button>
+    <button onclick="appendOperator('Math.abs(')">|x|</button>
+
+    <!-- Buttons for brackets -->
+    <button onclick="appendOperator('(')"> ( </button>
+    <button onclick="appendOperator(')')"> ) </button>
+
+    <!-- New buttons for percentage and factorial -->
+    <button onclick="appendOperator('%')">%</button>
+    <button onclick="appendOperator('!')">!</button>
+  </div>
+</div>
+
+<script>
+  let display = document.getElementById('display');
+  let expression = '';
+
+  function appendNumber(num) {
+    expression += num;
+    display.textContent = expression;
+  }
+
+  function appendOperator(operator) {
+    expression += operator;
+    display.textContent = expression;
+  }
+
+  function appendTrigFunction(func) {
+    // Handle trig functions separately to ensure degrees to radians conversion
+    expression += func + '(';
+    display.textContent = expression;
+  }
+
+  function clearDisplay() {
+    expression = '';
+    display.textContent = '';
+  }
+
+  function calculate() {
+    try {
+      // Replace trig function placeholders with actual JavaScript Math functions with radians conversion
+      expression = expression.replace(/sin\(/g, 'Math.sin(Math.PI/180*');
+      expression = expression.replace(/cos\(/g, 'Math.cos(Math.PI/180*');
+      expression = expression.replace(/tan\(/g, 'Math.tan(Math.PI/180*');
+      expression = expression.replace(/csc\(/g, '1/Math.sin(Math.PI/180*');
+      expression = expression.replace(/sec\(/g, '1/Math.cos(Math.PI/180*');
+      expression = expression.replace(/cot\(/g, '1/Math.tan(Math.PI/180*');
+
+      // Replace factorial '!' with factorial function
+      expression = expression.replace(/!/g, 'factorial(');
+
+      let result = eval(expression);
+
+      // Handle very small numbers close to zero
+      if (Math.abs(result) < 1e-10) {
+        result = 0;
+      }
+
+      // Validation for tan(90) and cot(0)
+      if (expression.includes('Math.tan(Math.PI/2)') || expression.includes('1/Math.tan(0)')) {
+        display.textContent = "Undefined";
+        return;
+      }
+
+      display.textContent = result;
+      expression = result.toString();
+    } catch (error) {
+      display.textContent = "Error";
+    }
+  }
+
+  function clearOne() {
+    if (expression.length > 0) {
+      expression = expression.slice(0, -1); // Remove last character
+      display.textContent = expression;
+    }
+  }
+
+  function factorial(num) {
+    num = parseInt(num);
+    if (num < 0) {
+      return "Error: Factorial of a negative number is undefined";
+    } else if (num === 0 || num === 1) {
+      return 1;
+    } else {
+      let result = 1;
+      for (let i = 2; i <= num; i++) {
+        result *= i;
+      }
+      return result;
+    }
+  }
+</script>
+
+</body>
+</html>
